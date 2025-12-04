@@ -1,0 +1,57 @@
+# robots.txt for finalgradecalculators.us
+# https://finalgradecalculators.us/robots.txt
+
+# Allow all search engine crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://finalgradecalculators.us/sitemap.xml
+
+# Crawl-delay (optional - helps prevent server overload)
+Crawl-delay: 1
+
+# Block access to admin or private areas (if any)
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /node_modules/
+
+# Allow important static assets
+Allow: /images/
+Allow: /favicon.ico
+Allow: /*.css
+Allow: /*.js
+
+# Specific search engine rules (optional)
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 2
+
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# Block bad bots and scrapers
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
