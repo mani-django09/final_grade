@@ -6,8 +6,13 @@ import path from "path";
 import { defineConfig } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
+const isDev = process.env.NODE_ENV !== "production";
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
+// vitePluginManusRuntime and jsxLocPlugin are dev-only tooling: the former
+// bloats HTML by ~360KB in production, the latter stamps every element with
+// a data-loc="path/to/File.tsx:N" attribute that leaks source file paths and
+// bloats output for no benefit once there's no editor on the other end to use it.
+const plugins = [react(), tailwindcss(), ...(isDev ? [jsxLocPlugin(), vitePluginManusRuntime()] : [])];
 
 export default defineConfig({
   plugins,
@@ -24,6 +29,16 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React/react-dom almost never change between deploys, unlike app
+          // code — splitting them out means a redeploy only invalidates the
+          // (much smaller) app chunk's cache, not this one too.
+          vendor: ["react", "react-dom"],
+        },
+      },
+    },
   },
   server: {
     host: true,

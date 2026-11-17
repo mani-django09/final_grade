@@ -1,0 +1,47 @@
+<!doctype html><html><head><meta charset="utf-8"><title>B — Light Editorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#fbfbfd;color:#0b0d17}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:22px 64px}
+.logo{font-weight:800;font-size:1.2rem;letter-spacing:-.03em}.logo span{background:linear-gradient(135deg,#4f46e5,#06b6d4);-webkit-background-clip:text;color:transparent}
+.links{display:flex;gap:32px;font-size:.88rem;color:#6b7280;align-items:center}.links .cta{background:#0b0d17;color:#fff;padding:9px 18px;border-radius:100px;font-weight:600}
+.hero{position:relative;overflow:hidden;text-align:center;padding:72px 64px 60px}
+.mesh{position:absolute;inset:0;background:radial-gradient(600px 300px at 20% 10%,rgba(129,140,248,.22),transparent 70%),radial-gradient(500px 280px at 85% 20%,rgba(34,211,238,.18),transparent 70%),radial-gradient(500px 300px at 50% 90%,rgba(244,114,182,.12),transparent 70%)}
+.hero>*{position:relative}
+.eyebrow{font-size:.8rem;color:#4f46e5;font-weight:600;background:#eef2ff;border:1px solid #e0e7ff;padding:6px 14px;border-radius:100px;display:inline-block}
+h1{font-family:'Instrument Serif',serif;font-weight:400;font-size:5.4rem;line-height:.98;letter-spacing:-.02em;margin:22px auto 20px;max-width:900px}
+h1 i{color:#4f46e5}
+.sub{font-size:1.1rem;color:#6b7280;max-width:520px;margin:0 auto;line-height:1.6}
+.card{max-width:880px;margin:48px auto 0;background:#fff;border:1px solid #eceef3;border-radius:24px;padding:10px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 30px 80px -30px rgba(79,70,229,.25);display:grid;grid-template-columns:1.4fr 1fr;text-align:left}
+.form{padding:26px}.row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+label{display:block;font-size:.78rem;font-weight:600;color:#374151;margin-bottom:8px}
+.in{height:54px;border-radius:12px;border:1px solid #e5e7eb;background:#fafafa;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:1.2rem;font-weight:600}.in i{font-style:normal;color:#9ca3af;font-size:.9rem}
+.btn{margin-top:16px;height:52px;border-radius:12px;background:#0b0d17;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600}
+.res{border-radius:18px;background:linear-gradient(160deg,#eef2ff,#ecfeff);padding:26px;display:flex;flex-direction:column;justify-content:center}
+.res small{font-size:.75rem;font-weight:600;color:#6366f1;letter-spacing:.06em;text-transform:uppercase}
+.big{font-family:'Instrument Serif',serif;font-size:5.5rem;line-height:1;margin:6px 0}
+.bar{height:8px;border-radius:9px;background:#dbe3ff;overflow:hidden}.bar div{width:96%;height:100%;background:linear-gradient(90deg,#6366f1,#06b6d4)}
+.res p{font-size:.85rem;color:#4b5563;margin-top:12px}
+.trust{display:flex;justify-content:center;gap:48px;padding:40px 0 30px;color:#6b7280;font-size:.85rem}.trust b{color:#0b0d17}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:40px 64px 90px;border-top:1px solid #e5e7eb}
+.step{padding:32px 28px 0 0}.step em{font-family:'Instrument Serif',serif;font-style:italic;font-size:2rem;color:#4f46e5}.step h3{font-size:1.05rem;margin:8px 0}.step p{color:#6b7280;font-size:.9rem;line-height:1.6}
+</style></head><body>
+<div class="nav"><div class="logo">FinalGrade<span>Calculator</span></div><div class="links"><span>Grade Calculator</span><span>GPA Calculator</span><span>Test Grade</span><span class="cta">Final Grade</span></div></div>
+<section class="hero"><div class="mesh"></div>
+<span class="eyebrow">Free final grade calculator</span>
+<h1>What do you need on <i>your final?</i></h1>
+<p class="sub">Enter three numbers and get the exact score — worked out in your browser, nothing saved.</p>
+<div class="card"><div class="form"><div class="row">
+<div><label>Current grade</label><div class="in">88<i>%</i></div></div>
+<div><label>Final weight</label><div class="in">25<i>%</i></div></div>
+<div><label>Goal grade</label><div class="in">90<i>%</i></div></div></div>
+<div class="btn">Calculate →</div></div>
+<div class="res"><small>You need</small><div class="big">96%</div><div class="bar"><div></div></div><p>Near perfect — tough, but possible.</p></div>
+</div>
+<div class="trust"><span><b>4</b> free calculators</span><span><b>0</b> data stored</span><span><b>&lt;1s</b> results</span><span><b>100%</b> free</span></div>
+</section>
+<section class="steps">
+<div class="step"><em>i.</em><h3>Enter your current grade</h3><p>Your standing before the final.</p></div>
+<div class="step"><em>ii.</em><h3>Add the final's weight</h3><p>From your syllabus, usually 20–40%.</p></div>
+<div class="step"><em>iii.</em><h3>Get your target</h3><p>Plus a what-if slider for other scores.</p></div>
+</section></body></html>

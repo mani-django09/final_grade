@@ -7,47 +7,103 @@
   <!-- Homepage - Final Grade Calculator -->
   <url>
     <loc>https://finalgradecalculators.us/</loc>
-    <lastmod>2024-12-03</lastmod>
+    <lastmod>2026-09-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <!-- Grade Calculator Page -->
   <url>
-    <loc>https://finalgradecalculators.us/grades</loc>
-    <lastmod>2024-12-03</lastmod>
+    <loc>https://finalgradecalculators.us/grade-calculator</loc>
+    <lastmod>2026-09-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
-  <!-- About Page (if exists) -->
+  <!-- GPA Calculator Page -->
+  <url>
+    <loc>https://finalgradecalculators.us/gpa-calculator</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- High School GPA Calculator Page -->
+  <url>
+    <loc>https://finalgradecalculators.us/high-school-gpa-calculator</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Weighted GPA Calculator Page -->
+  <url>
+    <loc>https://finalgradecalculators.us/weighted-gpa-calculator</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Cumulative GPA Calculator Page -->
+  <url>
+    <loc>https://finalgradecalculators.us/cumulative-gpa-calculator</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- AP Score Calculator Page -->
+  <url>
+    <loc>https://finalgradecalculators.us/ap-score-calculator</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- SAT Score Calculator Page -->
+  <url>
+    <loc>https://finalgradecalculators.us/sat-score-calculator</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Test Grade Calculator Page -->
+  <url>
+    <loc>https://finalgradecalculators.us/test-grade-calculator</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- About Page -->
   <url>
     <loc>https://finalgradecalculators.us/about</loc>
-    <lastmod>2024-12-03</lastmod>
+    <lastmod>2026-09-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-  
-  <!-- Privacy Policy Page (if exists) -->
+
+  <!-- Privacy Policy Page -->
   <url>
     <loc>https://finalgradecalculators.us/privacy</loc>
-    <lastmod>2024-12-03</lastmod>
+    <lastmod>2026-09-14</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-  
-  <!-- Terms of Service Page (if exists) -->
+
+  <!-- Terms of Service Page -->
   <url>
     <loc>https://finalgradecalculators.us/terms</loc>
-    <lastmod>2024-12-03</lastmod>
+    <lastmod>2026-09-14</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-  
-  <!-- Contact Page (if exists) -->
+
+  <!-- Contact Page -->
   <url>
     <loc>https://finalgradecalculators.us/contact</loc>
-    <lastmod>2024-12-03</lastmod>
+    <lastmod>2026-09-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

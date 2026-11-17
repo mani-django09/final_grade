@@ -1,0 +1,50 @@
+<!doctype html><html><head><meta charset="utf-8"><title>A — Dark Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#05060d;color:#fff}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:22px 64px;border-bottom:1px solid rgba(255,255,255,.06)}
+.logo{font-weight:800;font-size:1.2rem;letter-spacing:-.03em}.logo span{background:linear-gradient(135deg,#818cf8,#22d3ee);-webkit-background-clip:text;color:transparent}
+.links{display:flex;gap:32px;font-size:.88rem;color:rgba(255,255,255,.55)}.links b{color:#fff;font-weight:600}
+.hero{position:relative;overflow:hidden;padding:80px 64px 100px;display:grid;grid-template-columns:1.05fr 1fr;gap:64px;align-items:center}
+.hero:before{content:'';position:absolute;width:900px;height:900px;right:-300px;top:-400px;background:radial-gradient(circle,rgba(99,102,241,.35),transparent 60%)}
+.hero:after{content:'';position:absolute;width:700px;height:700px;left:-250px;bottom:-450px;background:radial-gradient(circle,rgba(34,211,238,.18),transparent 60%)}
+.hero>*{position:relative;z-index:1}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a5b4fc;border:1px solid rgba(165,180,252,.25);padding:7px 14px;border-radius:100px;background:rgba(99,102,241,.08)}
+.dot{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399}
+h1{font-size:4.4rem;line-height:1.02;letter-spacing:-.045em;font-weight:900;margin:24px 0 22px}
+h1 span{background:linear-gradient(100deg,#c7d2fe,#818cf8 40%,#22d3ee);-webkit-background-clip:text;color:transparent}
+.sub{font-size:1.1rem;line-height:1.65;color:rgba(255,255,255,.55);max-width:480px}
+.chips{display:flex;gap:28px;margin-top:40px}.chips div{font-size:.8rem;color:rgba(255,255,255,.45)}.chips b{display:block;font-size:1.5rem;color:#fff;font-weight:800;margin-bottom:2px}
+.card{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);border-radius:28px;padding:34px;backdrop-filter:blur(20px);box-shadow:0 50px 100px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03) inset}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+label{display:block;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px}
+.in{height:56px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:1.25rem;font-weight:700}
+.in i{font-style:normal;color:rgba(255,255,255,.3);font-size:.9rem}
+.btn{margin-top:18px;height:56px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 12px 40px rgba(99,102,241,.5)}
+.res{margin-top:18px;border-radius:20px;padding:24px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);display:flex;gap:24px;align-items:center}
+.ring{width:124px;height:124px;border-radius:50%;background:conic-gradient(#fb923c 0 96%,rgba(255,255,255,.07) 96%);display:grid;place-items:center;filter:drop-shadow(0 0 20px rgba(251,146,60,.45))}
+.ring div{width:100px;height:100px;border-radius:50%;background:#0b0c18;display:grid;place-items:center;font-size:2rem;font-weight:900}
+.badge{display:inline-block;margin-top:10px;font-size:.75rem;font-weight:700;color:#fdba74;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.3);padding:4px 12px;border-radius:100px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:0 64px 100px}
+.step{border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:30px;background:rgba(255,255,255,.02)}
+.step em{font-style:normal;font-size:.75rem;font-weight:700;color:#818cf8;letter-spacing:.1em}.step h3{font-size:1.15rem;margin:12px 0 8px}.step p{color:rgba(255,255,255,.45);font-size:.9rem;line-height:1.6}
+</style></head><body>
+<div class="nav"><div class="logo">FinalGrade<span>Calculator</span></div><div class="links"><b>Final Grade</b><span>Grade Calculator</span><span>GPA Calculator</span><span>Test Grade</span></div></div>
+<section class="hero"><div>
+<span class="eyebrow"><span class="dot"></span>Free · No sign-up · Nothing stored</span>
+<h1>Know your final<br><span>before you take it.</span></h1>
+<p class="sub">Three numbers in. The exact score you need on your final exam out — calculated in your browser, instantly.</p>
+<div class="chips"><div><b>4</b>Free calculators</div><div><b>0</b>Data stored</div><div><b>&lt;1s</b>Instant results</div></div>
+</div>
+<div class="card"><div class="row">
+<div><label>Current grade</label><div class="in">88<i>%</i></div></div>
+<div><label>Final weight</label><div class="in">25<i>%</i></div></div>
+<div><label>Goal grade</label><div class="in">90<i>%</i></div></div></div>
+<div class="btn">Calculate my score</div>
+<div class="res"><div class="ring"><div>96</div></div><div><label style="margin:0">Score needed on final</label><div style="font-size:2.6rem;font-weight:900;letter-spacing:-.04em">96%</div><span class="badge">Near perfect</span></div></div>
+</div></section>
+<section class="strip">
+<div class="step"><em>01</em><h3>Enter your current grade</h3><p>Your standing in the course right now, before the final.</p></div>
+<div class="step"><em>02</em><h3>Add the final's weight</h3><p>Straight from your syllabus — usually 20–40%.</p></div>
+<div class="step"><em>03</em><h3>See exactly what you need</h3><p>Plus a what-if slider to test other scores.</p></div>
+</section></body></html>

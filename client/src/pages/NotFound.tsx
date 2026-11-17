@@ -2,8 +2,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Home } from "lucide-react";
 import { useLocation } from "wouter";
+import { useSeo } from "@/hooks/useSeo";
 
 export default function NotFound() {
+  useSeo({
+    title: "Page Not Found – FinalGradeCalculators.us",
+    description: "The page you're looking for doesn't exist. Head back to our free final grade and course grade calculators.",
+    path: "/404",
+    noindex: true,
+  });
+
   const [, setLocation] = useLocation();
 
   const handleGoHome = () => {

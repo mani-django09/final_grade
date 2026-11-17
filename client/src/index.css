@@ -175,3 +175,5 @@
     }
   }
 }
+/* Navigation CTAs are real <a> links (crawlable) styled like buttons. */
+a.cta-btn, a.cta-btn-outline, a.dc-cta-btn, a.compare-link { text-decoration: none; }

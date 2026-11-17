@@ -3,24 +3,123 @@
 
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Final Grade Calculator</title>    
-    <!-- THIS IS THE START OF A COMMENT BLOCK, BLOCK TO BE DELETED: Google Fonts here, example:
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Final Grade Calculator – Find Out What You Need on Your Final Exam</title>
+    <meta name="description" content="Calculate the exact score you need on your final exam to achieve your desired course grade. Free, instant, no login required." />
+    <meta name="keywords" content="final grade calculator, what do I need on my final, grade calculator, exam score needed, weighted grade calculator" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://finalgradecalculators.us/" />
+    <meta name="theme-color" content="#1e40af" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Final Grade Calculators" />
+    <meta property="og:url" content="https://finalgradecalculators.us/" />
+    <meta property="og:title" content="Final Grade Calculator – Find Out What You Need on Your Final Exam" />
+    <meta property="og:description" content="Calculate the exact score you need on your final exam. Free, instant, accurate." />
+    <meta property="og:image" content="https://finalgradecalculators.us/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="FinalGradeCalculator — free final exam, course grade, GPA, and test grade calculators" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Final Grade Calculator" />
+    <meta name="twitter:description" content="Find out exactly what you need on your final exam. Free and instant." />
+    <meta name="twitter:image" content="https://finalgradecalculators.us/og-image.png" />
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Structured Data – WebApplication (static, crawlable without JS) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "WebApplication",
+      "name": "Final Grade Calculator",
+      "url": "https://finalgradecalculators.us",
+      "description": "Calculate the exact score you need on your final exam to achieve your desired course grade. Free, instant, no login required.",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": {
+        "@type": "Organization",
+        "name": "FinalGradeCalculators.us",
+        "url": "https://finalgradecalculators.us"
+      }
+    }
+    </script>
+
+    <!-- Structured Data – FAQPage (static, crawlable without JS) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Where's the final exam weight listed in my syllabus?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Check the first few pages of your syllabus under Grading Policy or Course Assessment. Your instructor lists the percentage each component counts toward your grade. If not there, check Canvas or Blackboard — or email your professor."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What if the calculator tells me I need 110%?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "That means hitting your goal with just the final exam is not possible. Check if your professor offers extra credit, or consider adjusting your target grade. Dropping your goal by 3-5 points often makes it achievable."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "My class gets curved. How does that affect this?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A curve almost always helps you, so treat our number as the worst-case scenario. If your professor curves individual exams or final grades, the actual score you need is likely lower than what we show."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I convert letter grades to percentages?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes — check your syllabus for the conversion scale. Most schools use A = 93–96%, B+ = 87–89%, B = 83–86%, etc. Use the midpoint of the range for best accuracy."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How accurate is the final grade calculator?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The calculator uses the exact weighted average formula that professors use: Required Score = (Desired Grade - Current Grade x (1 - Final Weight)) / Final Weight. It is 100% mathematically accurate."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Google Fonts – loaded once here, not per-component -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    THIS IS THE END OF A COMMENT BLOCK, BLOCK TO BE DELETED -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+    <!--
+      Analytics script goes here once there's a real endpoint + site ID to
+      point it at. The placeholder that used to sit here (%VITE_ANALYTICS_ENDPOINT%,
+      %VITE_ANALYTICS_WEBSITE_ID%) was never substituted with real values, so
+      every page load tried to load a script from a literal "%..." URL and
+      failed — the site has been shipping with zero analytics.
+    -->
   </body>
 
 </html>

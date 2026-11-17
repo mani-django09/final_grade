@@ -1,0 +1,266 @@
+/* Design C — shared by the calculator tool pages so they match the homepage
+   hero: cream page, black rotated tag, yellow-highlighted headline, offset-
+   shadow tiles and the indigo→cyan calculator panel. */
+
+.dc-page { background: #f4f1ea; min-height: 100vh; font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.dc-page * { box-sizing: border-box; }
+
+/* ── Hero intro ─────────────────────────────────── */
+.dc-hero { background: #f4f1ea; padding: 40px 24px 80px; overflow: hidden; }
+.dc-intro {
+  max-width: 1100px; margin: 0 auto 36px;
+  display: grid; grid-template-columns: 1.35fr 1fr; gap: 48px; align-items: end;
+}
+.dc-tag {
+  display: inline-block; background: #111; color: #f4f1ea;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em;
+  padding: 7px 13px; border-radius: 8px; transform: rotate(-2deg);
+}
+.dc-h1 {
+  color: #111; font-size: 4rem; line-height: 0.98; font-weight: 900;
+  letter-spacing: -0.05em; margin: 24px 0 0;
+}
+.dc-h1 u, .dc-h2 u { text-decoration: none; background: linear-gradient(transparent 62%, #fde047 62%); }
+.dc-sub { color: #444; font-size: 1.08rem; line-height: 1.6; max-width: 520px; margin: 20px 0 0; }
+.dc-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.dc-tile {
+  background: #fff; border: 2px solid #111; border-radius: 16px;
+  padding: 14px 16px; box-shadow: 4px 4px 0 #111;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.dc-tile:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #111; }
+.dc-tile b { display: block; font-size: 1.5rem; font-weight: 900; color: #111; letter-spacing: -0.03em; }
+.dc-tile span { font-size: 0.8rem; color: #555; }
+
+/* Homepage-style split: intro left, compact panel right. */
+.dc-split {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center;
+}
+.dc-split .dc-tiles { margin-top: 32px; max-width: 440px; }
+.dc-split .dc-panel { margin: 0; width: 100%; }
+
+/* ── Calculator panel ───────────────────────────── */
+.dc-panel {
+  position: relative; overflow: hidden; max-width: 1100px; margin: 0 auto;
+  border-radius: 32px; padding: 36px 40px; color: #fff;
+  background: linear-gradient(145deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
+  box-shadow: 0 30px 60px -20px rgba(79,70,229,0.55);
+}
+.dc-panel::before {
+  content: ''; position: absolute; width: 420px; height: 420px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); right: -150px; top: -170px; pointer-events: none;
+}
+.dc-panel > * { position: relative; }
+.dc-panel-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.dc-panel-title { font-size: 1.4rem; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
+.dc-hint { font-size: 0.8rem; color: rgba(255,255,255,0.8); margin: 10px 0 0; }
+
+.dc-seg { display: inline-flex; background: rgba(255,255,255,0.16); border-radius: 12px; padding: 4px; gap: 4px; flex-wrap: wrap; }
+.dc-seg button {
+  border: none; background: none; color: rgba(255,255,255,0.85); cursor: pointer;
+  padding: 8px 16px; border-radius: 9px; font-size: 0.85rem; font-weight: 700;
+  transition: background 0.15s, color 0.15s; min-height: 38px;
+}
+.dc-seg button:hover:not(.on) { color: #fff; background: rgba(255,255,255,0.1); }
+.dc-seg button.on { background: #111; color: #fff; }
+
+.dc-col-head { font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.78); text-transform: uppercase; letter-spacing: 0.06em; }
+.dc-row {
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px; padding: 12px 14px; transition: background 0.15s;
+  animation: dcRowIn 0.25s ease both;
+}
+.dc-row:hover, .dc-row:focus-within { background: rgba(255,255,255,0.2); }
+@keyframes dcRowIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+.dc-input, .dc-select {
+  height: 46px; width: 100%; background: #fff; color: #111;
+  border: 2px solid transparent; border-radius: 12px; outline: none;
+  font-size: 0.95rem; font-weight: 700; padding: 0 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.dc-input::placeholder { color: #a3a3a3; font-weight: 500; }
+.dc-input:hover:not(:focus), .dc-select:hover:not(:focus) { border-color: rgba(17,17,17,0.25); }
+.dc-input:focus, .dc-select:focus { border-color: #111; box-shadow: 0 0 0 4px rgba(255,255,255,0.3); }
+.dc-select {
+  appearance: none; cursor: pointer; padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23111' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 8px center; background-repeat: no-repeat; background-size: 1.2em;
+}
+.dc-suffix { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.8rem; font-weight: 700; pointer-events: none; }
+
+.dc-del {
+  height: 38px; width: 38px; border-radius: 10px; border: none; background: none;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.8); cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.dc-del:hover:not(:disabled) { background: #111; color: #fff; }
+.dc-del:disabled { opacity: 0.35; cursor: not-allowed; }
+/* Hover-to-reveal only where hover exists — touch users must always see it. */
+@media (hover: hover) {
+  .dc-del { opacity: 0; }
+  .dc-row:hover .dc-del, .dc-row:focus-within .dc-del { opacity: 1; }
+}
+
+.dc-actions { display: flex; gap: 10px; margin: 14px 0 18px; }
+.dc-add {
+  flex: 1; border: 1.5px dashed rgba(255,255,255,0.6); border-radius: 12px; padding: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 0.875rem; font-weight: 700; color: #fff; background: none; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.dc-add:hover { background: rgba(255,255,255,0.12); border-color: #fff; }
+.dc-clear {
+  padding: 12px 20px; border-radius: 12px; border: none; cursor: pointer;
+  font-size: 0.875rem; font-weight: 700; color: #fff; background: rgba(255,255,255,0.16);
+  transition: background 0.15s;
+}
+.dc-clear:hover { background: rgba(255,255,255,0.26); }
+
+.dc-note {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: #fff; color: #111; border-radius: 12px; padding: 12px 14px;
+  font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px;
+}
+.dc-note.warn { box-shadow: inset 4px 0 0 #f59e0b; }
+.dc-note.bad { box-shadow: inset 4px 0 0 #ef4444; }
+
+.dc-btn {
+  width: 100%; height: 58px; border: none; border-radius: 14px; cursor: pointer;
+  background: #111; color: #fff; font-size: 1.05rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.3); transition: background 0.15s, transform 0.15s;
+}
+.dc-btn:hover:not(:disabled) { background: #000; transform: translateY(-1px); }
+.dc-btn:disabled { opacity: 0.7; cursor: wait; }
+
+/* ── Result card ────────────────────────────────── */
+.dc-result {
+  margin-top: 18px; background: #111; color: #fff; border-radius: 20px;
+  padding: 22px 24px; scroll-margin: 90px;
+}
+.dc-result.flash-a, .dc-result.flash-b { animation: dcFlash 0.9s ease-out; }
+@keyframes dcFlash {
+  0%   { box-shadow: 0 0 0 0 rgba(253,224,71,0.9); transform: scale(0.985); }
+  30%  { box-shadow: 0 0 0 6px rgba(253,224,71,0.55); transform: scale(1.01); }
+  100% { box-shadow: 0 0 0 0 rgba(253,224,71,0); transform: scale(1); }
+}
+.dc-res-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.dc-res-label { color: rgba(255,255,255,0.55); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin: 0 0 4px; }
+.dc-res-big { font-size: 3.4rem; font-weight: 900; letter-spacing: -0.05em; line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
+.dc-res-big small { font-size: 1.2rem; color: rgba(255,255,255,0.45); margin-left: 2px; }
+.dc-letter {
+  display: inline-flex; align-items: baseline; gap: 8px; border-radius: 14px;
+  padding: 10px 16px; background: #fde047; color: #111;
+}
+.dc-letter b { font-size: 1.9rem; font-weight: 900; letter-spacing: -0.03em; line-height: 1; }
+.dc-letter span { font-size: 0.8rem; font-weight: 700; }
+.dc-track { height: 8px; background: rgba(255,255,255,0.12); border-radius: 100px; overflow: hidden; margin-top: 18px; }
+.dc-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #818cf8, #22d3ee); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+.dc-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+.dc-chip { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 12px; }
+.dc-chip b { display: block; font-size: 1.05rem; font-weight: 800; }
+.dc-chip span { font-size: 0.68rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.04em; }
+.dc-res-note { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin: 12px 0 0; line-height: 1.5; }
+.dc-empty {
+  margin-top: 18px; padding: 22px; text-align: center; border-radius: 18px;
+  border: 1.5px dashed rgba(255,255,255,0.5); color: rgba(255,255,255,0.9); font-size: 0.9rem;
+}
+.dc-micro { color: #666; font-size: 0.75rem; text-align: center; margin-top: 18px; }
+
+/* ── Content sections ───────────────────────────── */
+.dc-sec { padding: 88px 24px; }
+.dc-sec.white { background: #fff; }
+.dc-sec.cream { background: #f4f1ea; }
+.dc-sec.ink { background: #111; color: #fff; }
+.dc-sec-head { text-align: center; margin-bottom: 44px; }
+.dc-h2 { font-size: 2.6rem; font-weight: 900; color: #111; letter-spacing: -0.04em; line-height: 1.05; margin: 18px 0 12px; }
+.dc-sec.ink .dc-h2 { color: #fff; }
+.dc-sec.ink .dc-h2 u { background: linear-gradient(transparent 62%, rgba(253,224,71,0.45) 62%); }
+.dc-lead { color: #555; font-size: 1.02rem; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+.dc-sec.ink .dc-lead { color: rgba(255,255,255,0.6); }
+.dc-sec.ink .dc-tag { background: #fde047; color: #111; }
+
+.dc-card {
+  background: #fff; border: 2px solid #111; border-radius: 20px;
+  box-shadow: 5px 5px 0 #111; padding: 26px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.dc-card:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 #111; }
+.dc-card-ico {
+  width: 46px; height: 46px; border-radius: 12px; background: #111; color: #fde047;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+}
+.dc-card h3 { font-size: 1.05rem; font-weight: 800; color: #111; margin: 0 0 8px; }
+.dc-card p { color: #555; font-size: 0.9rem; line-height: 1.7; margin: 0; }
+.dc-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+.dc-formula { background: #111; color: #fde047; border-radius: 14px; padding: 16px 20px; text-align: center; font-family: 'SF Mono','Fira Code',monospace; font-weight: 700; font-size: 0.95rem; }
+.dc-code {
+  background: #f4f1ea; border: 2px solid #111; border-radius: 12px; padding: 14px 18px;
+  font-family: 'SF Mono','Fira Code',monospace; font-size: 0.85rem; color: #222; line-height: 1.9;
+}
+.dc-code .hl { background: #fde047; font-weight: 800; padding: 0 4px; border-radius: 4px; }
+.dc-kicker { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #111; margin: 0 0 10px; }
+
+.dc-table-wrap { overflow-x: auto; }
+.dc-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.dc-table th { text-align: left; padding: 12px 14px; background: #111; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.dc-table th:first-child { border-radius: 10px 0 0 10px; }
+.dc-table th:last-child { border-radius: 0 10px 10px 0; }
+.dc-table td { padding: 11px 14px; border-bottom: 1px solid #ece8de; color: #333; font-variant-numeric: tabular-nums; }
+.dc-table tr:last-child td { border-bottom: none; }
+.dc-table td:first-child { font-weight: 800; color: #111; }
+
+.dc-faq { background: #fff; border: 2px solid #111; border-radius: 14px; overflow: hidden; transition: box-shadow 0.15s; }
+.dc-faq.open, .dc-faq:hover { box-shadow: 4px 4px 0 #111; }
+.dc-faq button {
+  width: 100%; padding: 18px 22px; display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; background: none; border: none; cursor: pointer; text-align: left;
+  font-weight: 700; font-size: 0.95rem; color: #111;
+}
+.dc-faq-body { overflow: hidden; transition: max-height 0.3s ease; }
+.dc-faq-body p { padding: 0 22px 20px; margin: 0; color: #444; font-size: 0.9rem; line-height: 1.8; }
+
+.dc-cta-btn {
+  display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+  background: #fde047; color: #111; border: 2px solid #fde047; border-radius: 14px;
+  font-weight: 800; font-size: 1rem; padding: 15px 28px;
+  box-shadow: 4px 4px 0 #fff; transition: transform 0.15s, box-shadow 0.15s;
+}
+.dc-cta-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #fff; }
+
+@keyframes dcSpin { to { transform: rotate(360deg); } }
+.dc-spin { animation: dcSpin 1s linear infinite; display: inline-flex; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dc-result.flash-a, .dc-result.flash-b { animation: none; outline: 3px solid #fde047; }
+  .dc-row { animation: none; }
+}
+
+@media (max-width: 900px) {
+  .dc-intro, .dc-split { grid-template-columns: 1fr; gap: 28px; }
+  .dc-grid3 { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .dc-hero { padding: 28px 16px 56px; }
+  .dc-h1 { font-size: 2.6rem; }
+  .dc-h2 { font-size: 1.9rem; }
+  .dc-sec { padding: 64px 16px; }
+  .dc-panel { padding: 24px 16px; border-radius: 24px; }
+  .dc-tile { padding: 12px 14px; }
+  .dc-tile b { font-size: 1.25rem; }
+  .dc-col-heads { display: none !important; }
+  .dc-row-grid { grid-template-columns: var(--sm-cols, 1fr 1fr) !important; gap: 8px !important; }
+  .dc-row-grid .dc-input, .dc-row-grid .dc-select { font-size: 0.88rem; padding-left: 10px; }
+  .dc-row-grid .dc-select { padding-right: 24px; background-position: right 4px center; }
+  .dc-row-grid .dc-del { width: 30px; }
+  .dc-row { padding: 10px; }
+  .dc-row-grid .dc-full { grid-column: 1 / -1; }
+  .dc-row-grid .dc-hide-sm { display: none !important; }
+  .dc-res-big { font-size: 2.6rem; }
+  .dc-chips { grid-template-columns: 1fr 1fr 1fr; }
+  .dc-chip { padding: 8px; }
+  .dc-chip b { font-size: 0.92rem; }
+}

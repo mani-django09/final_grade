@@ -1,168 +1,171 @@
-import { Calculator, Users, Target, Heart, TrendingUp, BookOpen } from "lucide-react";
+import { Link } from "wouter";
+import { Calculator, Shield, GraduationCap, ArrowRight, Zap, BookOpen } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+import { useSeo } from "@/hooks/useSeo";
 
 export default function AboutUs() {
+  useSeo({
+    title: "About Us – Free Grade Calculators for Students",
+    description: "Learn about FinalGradeCalculators.us — free, accurate grade calculators built to help students plan smarter, track progress, and hit their academic goals.",
+    path: "/about",
+  });
+
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+    <div style={{ fontFamily: "'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif", minHeight: "100vh", background: "#f8fafc" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+        * { box-sizing: border-box; }
 
-        .font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .font-mono { font-family: 'Space Mono', monospace; }
+        .ab-hero { position: relative; padding: 72px 24px 64px; overflow: hidden;
+          background: linear-gradient(145deg,#060812 0%,#0e0c2a 35%,#0a1a3a 65%,#060d1f 100%); }
+        .ab-orb-1 { position:absolute; top:-160px; right:-80px; width:600px; height:600px; border-radius:50%;
+          background:radial-gradient(circle,rgba(99,102,241,0.18) 0%,transparent 65%); pointer-events:none; }
+        .ab-orb-2 { position:absolute; bottom:-120px; left:-60px; width:420px; height:420px; border-radius:50%;
+          background:radial-gradient(circle,rgba(56,189,248,0.11) 0%,transparent 65%); pointer-events:none; }
 
-        .glass-card {
-          background: rgba(255, 255, 255, 0.03);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+        .pill {
+          display:inline-flex; align-items:center; gap:6px;
+          background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2);
+          border-radius:100px; padding:5px 14px; color:#6366f1;
+          font-size:0.75rem; font-weight:600; letter-spacing:0.06em;
+          text-transform:uppercase; margin-bottom:14px;
+        }
+        .pill-dark { background:rgba(99,102,241,0.12); border-color:rgba(99,102,241,0.3); color:#a5b4fc; }
+
+        .sec-h2 { font-size:2.2rem; font-weight:900; color:#0f172a; letter-spacing:-0.025em; margin:0 0 14px; }
+        .sec-h2-dark { font-size:2.2rem; font-weight:900; color:white; letter-spacing:-0.025em; margin:0 0 14px; }
+
+        .principle-card {
+          background:white; border:1px solid #e2e8f0; border-radius:20px; overflow:hidden;
+          transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .principle-card:hover { transform:translateY(-6px); border-color:#c7d2fe; box-shadow:0 20px 48px rgba(99,102,241,0.14); }
+
+        .formula-note {
+          background:white; border:1px solid #e2e8f0; border-radius:20px;
+          padding:32px; box-shadow:0 4px 16px rgba(0,0,0,0.04);
+        }
+        .formula-code {
+          background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;
+          padding:14px 18px; font-family:'SF Mono','Fira Code',monospace;
+          font-size:0.85rem; color:#334155; text-align:center; font-weight:600;
         }
 
-        .glass-card-light {
-          background: rgba(255, 255, 255, 0.97);
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        .cta-wrap {
+          position:relative; overflow:hidden;
+          background:linear-gradient(145deg,#060812 0%,#0d0b28 50%,#060d1f 100%);
+          padding:90px 24px;
         }
-
-        .fade-in {
-          animation: fadeIn 0.5s ease-out forwards;
+        .cta-wrap::before { content:''; position:absolute; inset:0;
+          background:radial-gradient(ellipse at 50% 50%,rgba(99,102,241,0.15) 0%,transparent 65%); }
+        .cta-btn {
+          display:inline-flex; align-items:center; gap:10px;
+          background:white; color:#4f46e5; font-weight:800; font-size:1rem;
+          padding:16px 32px; border-radius:14px; border:none; cursor:pointer;
+          transition:all 0.25s; box-shadow:0 12px 40px rgba(0,0,0,0.4);
         }
+        .cta-btn:hover { transform:translateY(-3px); box-shadow:0 20px 56px rgba(0,0,0,0.5); }
+        .cta-btn-outline {
+          display:inline-flex; align-items:center; gap:10px;
+          background:rgba(255,255,255,0.06); color:white; font-weight:700; font-size:1rem;
+          padding:16px 32px; border-radius:14px; border:1px solid rgba(255,255,255,0.18); cursor:pointer;
+          transition:all 0.25s;
+        }
+        .cta-btn-outline:hover { background:rgba(255,255,255,0.1); }
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+        @media (max-width:640px) {
+          .ab-hero h1 { font-size:2.2rem !important; }
+          .sec-h2, .sec-h2-dark { font-size:1.7rem !important; }
         }
       `}</style>
 
-      <Header/>
+      <Header />
 
-      {/* Hero Section */}
-      <section className="relative py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12 fade-in">
-            <h2 className="font-jakarta font-extrabold text-4xl sm:text-5xl text-white mb-4 leading-tight">
-              About Final Grade Calculators
-            </h2>
-            <p className="font-jakarta text-lg text-blue-200/80 max-w-2xl mx-auto">
-              Built by students, for students. We're here to make finals week a little less stressful.
+      {/* ═════════════ HERO ═════════════ */}
+      <section className="ab-hero">
+        <div className="ab-orb-1" /><div className="ab-orb-2" />
+        <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 }}>
+          <div className="pill pill-dark"><GraduationCap style={{ width: 12, height: 12 }} />About</div>
+          <h1 style={{ fontSize: "3rem", fontWeight: 900, color: "white", lineHeight: 1.1, letterSpacing: "-0.03em", margin: "0 0 16px" }}>
+            Grade math, done right
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "1.1rem", lineHeight: 1.65, maxWidth: 560, margin: "0 auto" }}>
+            FinalGradeCalculators.us runs the same weighted-average formulas your professors use — no account, no ads, no data collection. Just the number you need.
+          </p>
+        </div>
+      </section>
+
+      {/* ═════════════ WHAT THE SITE DOES ═════════════ */}
+      <section style={{ padding: "90px 24px", background: "white" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <div className="pill"><Calculator style={{ width: 12, height: 12 }} />What's here</div>
+            <h2 className="sec-h2">Four calculators, one job each</h2>
+            <p style={{ color: "#64748b", fontSize: "1.05rem", maxWidth: 480, margin: "0 auto" }}>
+              Each tool answers one specific question — pick the one that matches what you're actually asking.
             </p>
           </div>
-        </div>
-      </section>
-
-      {/* Mission Section */}
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="glass-card-light rounded-2xl p-8 sm:p-10">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-100">
-                <Target className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="font-jakarta font-bold text-2xl text-slate-900">Our Mission</h3>
-            </div>
-            <div className="font-jakarta text-slate-700 space-y-4 leading-relaxed">
-              <p>
-                We created Final Grade Calculators with one simple goal: to help students understand exactly where they stand academically and what they need to achieve their goals.
-              </p>
-              <p>
-                Finals week is stressful enough without having to wonder "what do I need to get on this exam?" We believe every student deserves quick, accurate answers to that question—without ads, paywalls, or unnecessary complexity.
-              </p>
-              <p>
-                Our tools are completely free, easy to use, and built with the same care we'd want if we were sitting in your shoes, calculator in hand, trying to figure out our next move.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Values Section */}
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h3 className="font-jakarta font-bold text-2xl text-white text-center mb-8">What We Stand For</h3>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 20 }}>
             {[
-              {
-                icon: <Heart className="w-6 h-6" />,
-                title: "Student-First",
-                description: "Every decision we make is guided by what's best for students. No ads, no distractions, just tools that work."
-              },
-              {
-                icon: <TrendingUp className="w-6 h-6" />,
-                title: "Accuracy Matters",
-                description: "We use the exact same formulas your professors use. The math is reliable, so your planning can be too."
-              },
-              {
-                icon: <Users className="w-6 h-6" />,
-                title: "Accessible to All",
-                description: "Free tools for everyone. Whether you're in high school or grad school, we're here to help."
-              }
-            ].map((value, idx) => (
-              <div key={idx} className="glass-card rounded-xl p-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-blue-500/20 text-blue-400 mb-4">
-                  {value.icon}
+              { grad: "linear-gradient(135deg,#6366f1,#4f46e5)", icon: <Zap style={{ width: 22, height: 22, color: "white" }} />, title: "Final Grade Calculator", desc: "What score do you need on your final to hit a target course grade?" },
+              { grad: "linear-gradient(135deg,#0ea5e9,#0284c7)", icon: <Calculator style={{ width: 22, height: 22, color: "white" }} />, title: "Grade Calculator", desc: "What's your current grade across all your graded assignments?" },
+              { grad: "linear-gradient(135deg,#10b981,#059669)", icon: <GraduationCap style={{ width: 22, height: 22, color: "white" }} />, title: "GPA Calculator", desc: "What's your weighted, unweighted, or cumulative GPA?" },
+              { grad: "linear-gradient(135deg,#f59e0b,#d97706)", icon: <BookOpen style={{ width: 22, height: 22, color: "white" }} />, title: "Test Grade Calculator", desc: "What did you score on one test, and what's the grading chart for it?" },
+            ].map((f, i) => (
+              <div key={i} className="principle-card">
+                <div style={{ height: 5, background: f.grad }} />
+                <div style={{ padding: 24 }}>
+                  <div style={{ background: f.grad, width: 46, height: 46, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>{f.icon}</div>
+                  <h3 style={{ fontWeight: 700, fontSize: "1rem", color: "#0f172a", margin: "0 0 8px" }}>{f.title}</h3>
+                  <p style={{ color: "#64748b", fontSize: "0.875rem", lineHeight: 1.65, margin: 0 }}>{f.desc}</p>
                 </div>
-                <h4 className="font-jakarta font-bold text-lg text-white mb-2">{value.title}</h4>
-                <p className="font-jakarta text-sm text-blue-100/60 leading-relaxed">{value.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Story Section */}
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="glass-card rounded-2xl p-8 sm:p-10">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-500/20">
-                <BookOpen className="w-6 h-6 text-blue-400" />
-              </div>
-              <h3 className="font-jakarta font-bold text-2xl text-white">Our Story</h3>
+      {/* ═════════════ HOW IT'S BUILT ═════════════ */}
+      <section style={{ padding: "90px 24px", background: "#f8fafc" }}>
+        <div style={{ maxWidth: 700, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <div className="pill"><Shield style={{ width: 12, height: 12 }} />How it works</div>
+            <h2 className="sec-h2">No account, no server, no catch</h2>
+          </div>
+          <div className="formula-note">
+            <p style={{ color: "#475569", lineHeight: 1.8, marginBottom: 20, fontSize: "0.95rem" }}>
+              Every calculation on this site runs in your browser using standard weighted-average math — the same formula printed in most syllabi:
+            </p>
+            <div className="formula-code" style={{ marginBottom: 20 }}>
+              Grade = Σ(score × weight) ÷ Σ(weight)
             </div>
-            <div className="font-jakarta text-blue-100/80 space-y-4 leading-relaxed">
-              <p>
-                Final Grade Calculators started the way most student projects do: out of necessity. We were tired of hunting through cluttered websites filled with ads and pop-ups just to answer a simple question about our grades.
-              </p>
-              <p>
-                We wanted something clean, fast, and honest. A tool that respects your time and gives you the information you need without the noise. So we built it ourselves.
-              </p>
-              <p>
-                Today, thousands of students use our calculators to plan their study time, set realistic goals, and reduce the anxiety that comes with not knowing where you stand. We're proud to be a small part of your academic journey.
-              </p>
-            </div>
+            <p style={{ color: "#475569", lineHeight: 1.8, margin: 0, fontSize: "0.95rem" }}>
+              Nothing you type gets sent to a server or stored anywhere — refresh the page and it's gone. That's covered in more detail on the <a href="/privacy" style={{ color: "#4f46e5", fontWeight: 600 }}>privacy page</a>.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="glass-card rounded-2xl p-8 text-center">
-            <Calculator className="w-10 h-10 text-blue-400 mx-auto mb-4" />
-            <h3 className="font-jakarta font-bold text-2xl text-white mb-3">
-              Ready to Calculate Your Grade?
-            </h3>
-            <p className="font-jakarta text-blue-100/60 mb-6 max-w-md mx-auto">
-              Try our tools and see how easy grade planning can be.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/"
-                className="inline-flex items-center justify-center font-jakarta font-bold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-blue-500/25 transition-all"
-              >
-                Final Grade Calculator
-              </a>
-              <a
-                href="/grades"
-                className="inline-flex items-center justify-center font-jakarta font-bold border-2 border-blue-400/30 bg-blue-500/10 hover:bg-blue-500/20 text-white px-6 py-3 rounded-xl transition-all"
-              >
-                Grade Calculator
-              </a>
-            </div>
+      {/* ═════════════ CTA ═════════════ */}
+      <section className="cta-wrap">
+        <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 }}>
+          <h2 className="sec-h2-dark">Ready to calculate?</h2>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "1.05rem", maxWidth: 460, margin: "0 auto 32px", lineHeight: 1.65 }}>
+            Pick the calculator that matches your question.
+          </p>
+          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+            <Link href="/" className="cta-btn">
+              Final Grade Calculator<ArrowRight style={{ width: 16, height: 16 }} />
+            </Link>
+            <Link href="/gpa-calculator" className="cta-btn-outline">
+              GPA Calculator
+            </Link>
           </div>
         </div>
       </section>
-      {/* Footer Component */}
-      <Footer/>
+
+      <Footer />
     </div>
   );
 }

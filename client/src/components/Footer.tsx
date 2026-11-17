@@ -1,4 +1,4 @@
-import { Calculator, Mail, Github, Twitter, Linkedin } from "lucide-react";
+import { Mail, Github, Twitter, Linkedin } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -6,11 +6,6 @@ export default function Footer() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
-        
-        .font-inter { font-family: 'Inter', sans-serif; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-
         .footer-link {
           transition: all 0.2s ease;
         }
@@ -37,11 +32,26 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
             {/* Brand Column */}
             <div className="md:col-span-1">
-              <div className="flex items-center gap-2 mb-5">
-                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600">
-                  <Calculator className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-inter font-bold text-gray-900 text-xl">GradeCalc</span>
+              <div className="mb-5">
+                <span style={{
+                  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+                  fontSize: '1.25rem',
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1,
+                  background: 'linear-gradient(135deg, #1e1b4b 0%, #4f46e5 50%, #3b82f6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  display: 'inline-block',
+                }}>
+                  FinalGrade<span style={{
+                    background: 'linear-gradient(135deg, #4f46e5, #06b6d4)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}>Calculator</span>
+                </span>
               </div>
               <p className="font-inter text-sm text-gray-600 mb-6 leading-relaxed">
                 Free, accurate grade calculators helping students plan smarter and achieve their academic goals.
@@ -97,6 +107,41 @@ export default function Footer() {
                 <li>
                   <a href="/grade-calculator" className="footer-link font-inter text-sm text-gray-600 flex items-center">
                     Grade Calculator
+                  </a>
+                </li>
+                <li>
+                  <a href="/gpa-calculator" className="footer-link font-inter text-sm text-gray-600 flex items-center">
+                    GPA Calculator
+                  </a>
+                </li>
+                <li>
+                  <a href="/high-school-gpa-calculator" className="footer-link font-inter text-sm text-gray-600 flex items-center">
+                    High School GPA Calculator
+                  </a>
+                </li>
+                <li>
+                  <a href="/weighted-gpa-calculator" className="footer-link font-inter text-sm text-gray-600 flex items-center">
+                    Weighted GPA Calculator
+                  </a>
+                </li>
+                <li>
+                  <a href="/cumulative-gpa-calculator" className="footer-link font-inter text-sm text-gray-600 flex items-center">
+                    Cumulative GPA Calculator
+                  </a>
+                </li>
+                <li>
+                  <a href="/ap-score-calculator" className="footer-link font-inter text-sm text-gray-600 flex items-center">
+                    AP Score Calculator
+                  </a>
+                </li>
+                <li>
+                  <a href="/sat-score-calculator" className="footer-link font-inter text-sm text-gray-600 flex items-center">
+                    SAT Score Calculator
+                  </a>
+                </li>
+                <li>
+                  <a href="/test-grade-calculator" className="footer-link font-inter text-sm text-gray-600 flex items-center">
+                    Test Grade Calculator
                   </a>
                 </li>
               </ul>

@@ -1,775 +1,317 @@
-import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useLocation } from "wouter";
-import { Plus, Loader2, Home, Target, ChevronDown, BarChart3, Calculator, AlertTriangle, X, Zap, RefreshCw, ArrowRight, TrendingUp } from "lucide-react";
+import { useState, useRef } from "react";
+import { Link } from "wouter";
+import { Plus, Loader2, ChevronDown, Calculator, AlertTriangle, X, Layers, RefreshCw, TrendingUp, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CalculatorLinks from "@/components/CalculatorLinks";
+import { useSeo } from "@/hooks/useSeo";
+import { useCountUp } from "@/hooks/useCountUp";
+import { useHighlightOnChange } from "@/hooks/useHighlightOnChange";
+import { calculateOverallGrade, letterForPercentage } from "@shared/gradeMath";
+import "@/styles/design-c.css";
 
 type GradeType = "percentage" | "letters" | "points";
+// Everything is kept as the raw input string so a blank field and a real 0
+// (e.g. 0/50 on a missed quiz) stay distinguishable.
+interface GradeEntry { id: string; name: string; grade: string; weight: string; points: string; maxPoints: string; }
 
-interface GradeEntry {
-  id: string;
-  name: string;
-  grade: string;
-  weight: number;
-  points?: number;
-  maxPoints?: number;
-}
-
-const letterGradeValues: { [key: string]: number } = {
-  "A+": 97, "A": 95, "A-": 92,
-  "B+": 89, "B": 85, "B-": 82,
-  "C+": 79, "C": 75, "C-": 72,
-  "D+": 69, "D": 65, "D-": 62,
-  "F": 50
-};
-
+const letterGradeValues: { [key: string]: number } = { "A+": 97, "A": 95, "A-": 92, "B+": 89, "B": 85, "B-": 82, "C+": 79, "C": 75, "C-": 72, "D+": 69, "D": 65, "D-": 62, "F": 50 };
 const letterGradeOptions = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"];
+const LETTER_CUTOFFS: [number, string][] = [[60, "D-"], [63, "D"], [67, "D+"], [70, "C-"], [73, "C"], [77, "C+"], [80, "B-"], [83, "B"], [87, "B+"], [90, "A-"], [93, "A"]];
+
+const blankRow = (): GradeEntry => ({ id: Math.random().toString(36).slice(2, 9), name: "", grade: "", weight: "", points: "", maxPoints: "" });
+const freshRows = () => [blankRow(), blankRow(), blankRow(), blankRow(), blankRow()];
+const num = (s: string) => (s.trim() === "" ? NaN : parseFloat(s));
+
+interface Result { overall: number; letter: string; counted: number; skipped: number; weightUsed: number; equalWeights: boolean; }
+
+const faqData = [
+  { question: "Does it matter if my percentages don't equal 100?", answer: "Not really. Maybe your prof hasn't posted every grade yet, or you're checking mid-semester before everything's due. The calculator divides by whatever weight you've entered so far, so the result is your current average on the work that's been graded." },
+  { question: "What if my class doesn't use weights?", answer: "Leave every weight box empty. When no weights are entered, each assignment counts equally and you get a plain average. If you fill in weights for some rows but not others, the rows without a weight are left out — the result card tells you how many." },
+  { question: "Should I put in every single homework or just the average?", answer: "Either works. Got ten homework assignments? You can list each one separately or just average them and enter that number once with the category's weight. You'll end up with the same grade either way." },
+  { question: "What's different about this versus the final exam one?", answer: "This shows your overall grade right now. The final exam calculator tells you what score you need on your final to hit whatever grade you're shooting for. Use this all semester, use that one during finals week." },
+  { question: "Can I throw in grades that are above 100 from extra credit?", answer: "Yes. If you ended up with 107% on something, enter 107. The math takes care of it without any problem." },
+  { question: "Do my grades get saved anywhere?", answer: "No. As soon as you close this page, everything is gone. Nothing is stored — it all lives in your browser while you're using it." },
+];
 
 export default function GradeCalculator() {
+  useSeo({
+    title: "Grade Calculator – Calculate Your Weighted Course Grade",
+    description: "Calculate your overall course grade from assignments, tests, and projects. Works with percentages, letter grades, or points. Free, instant, no login required.",
+    path: "/grade-calculator",
+    keywords: "grade calculator, weighted grade calculator, course grade calculator, assignment grade calculator, class grade calculator",
+  });
+
   const [gradeType, setGradeType] = useState<GradeType>("percentage");
-  const [grades, setGrades] = useState<GradeEntry[]>([
-    { id: "1", name: "", grade: "", weight: 0 },
-    { id: "2", name: "", grade: "", weight: 0 },
-    { id: "3", name: "", grade: "", weight: 0 },
-    { id: "4", name: "", grade: "", weight: 0 },
-    { id: "5", name: "", grade: "", weight: 0 },
-  ]);
-  const [mounted, setMounted] = useState(false);
+  const [grades, setGrades] = useState<GradeEntry[]>(freshRows);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
-  const [calculatedResult, setCalculatedResult] = useState<{ overallGrade: number; weightedSum: number; letterGrade: string } | null>(null);
-  const [, navigate] = useLocation();
+  const [result, setResult] = useState<Result | null>(null);
+  const [calcCount, setCalcCount] = useState(0);
+  const [barWidth, setBarWidth] = useState(0);
+  const [noInput, setNoInput] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const convertToPercentage = (entry: GradeEntry): number => {
-    if (gradeType === "letters") {
-      return letterGradeValues[entry.grade] || 0;
-    } else if (gradeType === "points") {
-      const points = entry.points || 0;
-      const maxPoints = entry.maxPoints || 100;
-      return maxPoints > 0 ? (points / maxPoints) * 100 : 0;
-    } else {
-      return parseFloat(entry.grade) || 0;
+  // Percentage for a row, or null when the row isn't filled in yet.
+  const rowPercent = (e: GradeEntry): number | null => {
+    if (gradeType === "letters") return e.grade ? letterGradeValues[e.grade] : null;
+    if (gradeType === "points") {
+      const pts = num(e.points), max = num(e.maxPoints);
+      return !isNaN(pts) && max > 0 ? (pts / max) * 100 : null;
     }
+    const g = num(e.grade);
+    return isNaN(g) ? null : g;
   };
 
   const handleCalculate = async () => {
+    const graded = grades
+      .map(g => ({ pct: rowPercent(g), weight: num(g.weight) }))
+      .filter((g): g is { pct: number; weight: number } => g.pct !== null);
+    if (!graded.length) { setNoInput(true); setResult(null); return; }
+    setNoInput(false);
     setIsCalculating(true);
-    setShowResult(false);
-    
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const validGrades = grades.filter(g => {
-      if (gradeType === "percentage") {
-        return g.grade !== "" && g.weight > 0;
-      } else if (gradeType === "letters") {
-        return g.grade !== "" && g.weight > 0;
-      } else {
-        return (g.points || 0) > 0 && (g.maxPoints || 0) > 0 && g.weight > 0;
-      }
+    await new Promise(r => setTimeout(r, 250));
+
+    // No weights at all → a plain average. Otherwise only weighted rows count.
+    const equalWeights = graded.every(g => !(g.weight > 0));
+    const used = equalWeights
+      ? graded.map(g => ({ grade: g.pct, weight: 1 }))
+      : graded.filter(g => g.weight > 0).map(g => ({ grade: g.pct, weight: g.weight }));
+    const { overallGrade, totalWeight } = calculateOverallGrade(used);
+
+    setResult({
+      overall: overallGrade,
+      letter: letterForPercentage(overallGrade),
+      counted: used.length,
+      skipped: graded.length - used.length,
+      weightUsed: equalWeights ? 0 : totalWeight,
+      equalWeights,
     });
-
-    if (validGrades.length === 0) {
-      setIsCalculating(false);
-      return;
-    }
-
-    let weightedSum = 0;
-    let totalWeight = 0;
-
-    validGrades.forEach(entry => {
-      const percentage = convertToPercentage(entry);
-      weightedSum += percentage * entry.weight;
-      totalWeight += entry.weight;
-    });
-
-    const overallGrade = totalWeight > 0 ? weightedSum / totalWeight : 0;
-    const letterGrade = getLetterFromPercentage(overallGrade);
-
-    setCalculatedResult({
-      overallGrade: Math.round(overallGrade * 100) / 100,
-      weightedSum: Math.round(weightedSum * 100) / 100,
-      letterGrade: letterGrade
-    });
-
     setIsCalculating(false);
-    setShowResult(true);
-    
-    setTimeout(() => {
-      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
+    setCalcCount(c => c + 1);
+    setBarWidth(0);
+    setTimeout(() => { setBarWidth(Math.min(Math.max(overallGrade, 0), 100)); resultRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 60);
   };
 
-  const getLetterFromPercentage = (percentage: number): string => {
-    if (percentage >= 93) return "A";
-    if (percentage >= 90) return "A-";
-    if (percentage >= 87) return "B+";
-    if (percentage >= 83) return "B";
-    if (percentage >= 80) return "B-";
-    if (percentage >= 77) return "C+";
-    if (percentage >= 73) return "C";
-    if (percentage >= 70) return "C-";
-    if (percentage >= 67) return "D+";
-    if (percentage >= 63) return "D";
-    if (percentage >= 60) return "D-";
-    return "F";
-  };
+  const addGrade = () => setGrades(gs => [...gs, blankRow()]);
+  const removeGrade = (id: string) => setGrades(gs => (gs.length > 1 ? gs.filter(g => g.id !== id) : gs));
+  const updateGrade = (id: string, field: keyof GradeEntry, value: string) => setGrades(gs => gs.map(g => (g.id === id ? { ...g, [field]: value } : g)));
+  const handleReset = () => { setGrades(freshRows()); setResult(null); setBarWidth(0); setNoInput(false); };
 
-  const addGrade = () => {
-    const newId = Math.random().toString(36).substr(2, 9);
-    setGrades([...grades, { id: newId, name: "", grade: "", weight: 0 }]);
-  };
+  const totalWeight = grades.reduce((s, g) => s + (num(g.weight) || 0), 0);
+  const animatedOverall = useCountUp(result?.overall ?? 0);
+  const flash = useHighlightOnChange(calcCount, 950);
 
-  const removeGrade = (id: string) => {
-    if (grades.length > 1) {
-      setGrades(grades.filter((g) => g.id !== id));
-    }
-  };
-
-  const updateGrade = (id: string, field: keyof GradeEntry, value: string | number) => {
-    setGrades(
-      grades.map((g) =>
-        g.id === id
-          ? { ...g, [field]: value }
-          : g
-      )
-    );
-  };
-
-  const handleReset = () => {
-    setGrades([
-      { id: "1", name: "", grade: "", weight: 0 },
-      { id: "2", name: "", grade: "", weight: 0 },
-      { id: "3", name: "", grade: "", weight: 0 },
-      { id: "4", name: "", grade: "", weight: 0 },
-      { id: "5", name: "", grade: "", weight: 0 },
-    ]);
-    setShowResult(false);
-    setCalculatedResult(null);
-  };
-
-  const handleNavigateHome = () => {
-    navigate("/");
-  };
-
-  const toggleFaq = (index: number) => {
-    setOpenFaq(openFaq === index ? null : index);
-  };
-
-  const totalWeight = grades.reduce((sum, g) => sum + (g.weight || 0), 0);
-
-  const getLetterGradeInfo = (letter: string) => {
-    if (letter.startsWith("A")) return { color: "green", label: "Excellent" };
-    if (letter.startsWith("B")) return { color: "blue", label: "Good" };
-    if (letter.startsWith("C")) return { color: "yellow", label: "Average" };
-    if (letter.startsWith("D")) return { color: "orange", label: "Below Average" };
-    return { color: "red", label: "Failing" };
-  };
-
-  const gradeInfo = calculatedResult ? getLetterGradeInfo(calculatedResult.letterGrade) : null;
-
-  const faqData = [
-    {
-      question: "Does it matter if my percentages don't equal 100?",
-      answer: "Not really. Maybe your prof hasn't posted every grade yet, or you're checking mid-semester before everything's due. The calculator figures out your current average based on whatever you've got so far. It's actually pretty handy for checking where you stand before the semester ends."
-    },
-    {
-      question: "Should I put in every single homework or just the average?",
-      answer: "Either works. Got ten homework assignments? You can list each one separately if you're obsessive about details, or just average them and stick that number in once. You'll end up with the same grade either way. I usually go with the average because it's less typing."
-    },
-    {
-      question: "What's different about this versus the final exam one?",
-      answer: "This shows your overall grade right now. The final exam calculator tells you what score you need to get on your final to hit whatever grade you're shooting for. Two different jobs. Use this one all semester to track progress, use that one when finals week rolls around and you're stressing."
-    },
-    {
-      question: "Can I throw in grades that are above 100 from extra credit?",
-      answer: "Yes, sure. If your professor gave you extra credit and you ended up with 107% on something, enter 107. The math takes care of it without any problem. Extra credit is there for one reason - to raise your grade, so be sure to count it."
-    },
-    {
-      question: "Do my grades get saved anywhere?",
-      answer: "No, nothing gets saved. As soon as you close this page, everything will deleted. We're not saving your information anywhere, it's all kept in your browser while you're using it. If you want to save your results, take a screenshot of them or write them ​‍​‌‍​‍‌​‍​‌‍​‍‌down."
-    }
-  ];
+  const nextLetter = result ? LETTER_CUTOFFS.find(([cut]) => cut > result.overall) : undefined;
+  const gridCols = gradeType === "points" ? "2fr 1fr 1fr 1fr 38px" : "2fr 1.4fr 1.1fr 38px";
+  const smCols = gradeType === "points" ? "1fr 1fr 1fr 30px" : "1fr 1fr 30px";
 
   return (
-    <div className="min-h-screen bg-white">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-        * {
-          font-family: 'Inter', -apple-system, system-ui, sans-serif;
-        }
-
-        .hero-bg {
-          background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-        }
-
-        .card {
-          background: white;
-          border: 1px solid #e5e7eb;
-          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
-
-        .input-box {
-          border: 1.5px solid #d1d5db;
-          transition: all 0.2s;
-        }
-
-        .input-box:focus {
-          border-color: #3b82f6;
-          outline: none;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .input-box:hover:not(:focus) {
-          border-color: #9ca3af;
-        }
-
-        .btn-primary {
-          background: #2563eb;
-          transition: all 0.2s;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-          background: #1d4ed8;
-          transform: translateY(-1px);
-        }
-
-        .btn-primary:active {
-          transform: translateY(0);
-        }
-
-        .type-tab {
-          transition: all 0.2s;
-        }
-
-        .type-tab.active {
-          background: #2563eb;
-          color: white;
-        }
-
-        .type-tab:not(.active) {
-          color: #6b7280;
-          border: 1px solid #e5e7eb;
-        }
-
-        .type-tab:not(.active):hover {
-          background: #f9fafb;
-          border-color: #d1d5db;
-        }
-
-        .row-item {
-          transition: background 0.15s;
-        }
-
-        .row-item:hover {
-          background: #f9fafb;
-        }
-
-        .add-btn {
-          border: 1.5px dashed #d1d5db;
-          transition: all 0.2s;
-        }
-
-        .add-btn:hover {
-          border-color: #2563eb;
-          color: #2563eb;
-          background: #eff6ff;
-        }
-
-        .delete-btn {
-          opacity: 0;
-          transition: opacity 0.2s;
-        }
-
-        .row-item:hover .delete-btn {
-          opacity: 1;
-        }
-
-        .delete-btn:hover {
-          color: #dc2626;
-        }
-
-        .faq-box {
-          border: 1px solid #e5e7eb;
-          transition: border-color 0.2s;
-        }
-
-        .faq-box:hover {
-          border-color: #d1d5db;
-        }
-
-        .faq-content {
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 0.3s ease;
-        }
-
-        .faq-content.open {
-          max-height: 400px;
-        }
-
-        .result-appear {
-          animation: slideUp 0.4s ease-out;
-        }
-
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .select-box {
-          border: 1.5px solid #d1d5db;
-          transition: all 0.2s;
-          background: white;
-          appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-          background-position: right 0.5rem center;
-          background-repeat: no-repeat;
-          background-size: 1.5em 1.5em;
-          padding-right: 2.5rem;
-        }
-
-        .select-box:focus {
-          border-color: #3b82f6;
-          outline: none;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .feature-card {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          border: 1px solid #e5e7eb;
-        }
-
-        .feature-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-          border-color: #3b82f6;
-        }
-
-        .feature-icon {
-          transition: all 0.3s ease;
-        }
-
-        .feature-card:hover .feature-icon {
-          transform: scale(1.1) rotate(5deg);
-        }
-      `}</style>
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org/",
-            "@type": "WebApplication",
-            name: "Grade Calculator",
-            description: "Calculate your overall course grade based on multiple weighted assignments. Supports percentage, letter grades, and points.",
-            url: "https://finalgradecalculators.us/grades",
-            applicationCategory: "EducationalApplication",
-            operatingSystem: "Any",
-            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" }
-          })
-        }}
-      />
+    <div className="dc-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org/", "@type": "WebApplication", name: "Grade Calculator", url: "https://finalgradecalculators.us/grade-calculator", applicationCategory: "EducationalApplication", operatingSystem: "Any", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } }) }} />
 
       <Header activePage="grade-calculator" />
 
-      {/* Hero */}
-      <section className="hero-bg py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-              Grade Calculator
-            </h1>
-            <p className="text-lg sm:text-xl text-blue-100 max-w-2xl mx-auto">
-              Type in your assignments and weights. See your course grade instantly.
-            </p>
+      {/* ═════════════ HERO + CALCULATOR ═════════════ */}
+      <section className="dc-hero">
+        <div className="dc-intro">
+          <div>
+            <span className="dc-tag">Grade Calculator</span>
+            <h1 className="dc-h1">Where does your grade <u>actually</u> stand?</h1>
+            <p className="dc-sub">List your assignments, tests and projects with their weights. You get the weighted course grade and letter, worked out in your browser.</p>
+          </div>
+          <div className="dc-tiles">
+            <div className="dc-tile"><b>3</b><span>grade formats</span></div>
+            <div className="dc-tile"><b>No cap</b><span>on assignments</span></div>
+            <div className="dc-tile"><b>0</b><span>data stored</span></div>
+            <div className="dc-tile"><b>100%</b><span>always free</span></div>
+          </div>
+        </div>
+
+        <div className="dc-panel">
+          <div className="dc-panel-head">
+            <h2 className="dc-panel-title">Add your grades</h2>
+            <div className="dc-seg" role="group" aria-label="Grade format">
+              {[{ id: "percentage", label: "Percent" }, { id: "letters", label: "Letters" }, { id: "points", label: "Points" }].map(t => (
+                <button key={t.id} onClick={() => setGradeType(t.id as GradeType)} className={gradeType === t.id ? "on" : ""} aria-pressed={gradeType === t.id}>{t.label}</button>
+              ))}
+            </div>
           </div>
 
-          {/* Main Calculator */}
-          <div className="max-w-5xl mx-auto">
-            <div className="card rounded-xl p-6 sm:p-8">
-              {/* Type Selector */}
-              <div className="mb-8">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Pick your grade format
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setGradeType("percentage")}
-                    className={`type-tab px-6 py-2.5 rounded-lg text-sm font-medium ${
-                      gradeType === "percentage" ? "active" : ""
-                    }`}
-                  >
-                    Percentages (85%)
-                  </button>
-                  <button
-                    onClick={() => setGradeType("letters")}
-                    className={`type-tab px-6 py-2.5 rounded-lg text-sm font-medium ${
-                      gradeType === "letters" ? "active" : ""
-                    }`}
-                  >
-                    Letters (A, B+)
-                  </button>
-                  <button
-                    onClick={() => setGradeType("points")}
-                    className={`type-tab px-6 py-2.5 rounded-lg text-sm font-medium ${
-                      gradeType === "points" ? "active" : ""
-                    }`}
-                  >
-                    Points (45/50)
-                  </button>
-                </div>
-              </div>
+          <div className="dc-col-heads" style={{ display: "grid", gridTemplateColumns: gridCols, gap: 10, padding: "0 14px 8px" }}>
+            <span className="dc-col-head">Assignment</span>
+            {gradeType === "points" ? <><span className="dc-col-head">Earned</span><span className="dc-col-head">Out of</span></> : <span className="dc-col-head">Grade</span>}
+            <span className="dc-col-head">Weight %</span>
+            <span />
+          </div>
 
-              {/* Assignments */}
-              <div className="space-y-3 mb-6">
-                {grades.map((grade, index) => (
-                  <div key={grade.id} className="row-item rounded-lg p-4 border border-gray-100">
-                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-                      {/* Name */}
-                      <div className={gradeType === "points" ? "sm:col-span-4" : "sm:col-span-5"}>
-                        <Label className="text-xs text-gray-600 mb-1.5 block">
-                          Name (optional)
-                        </Label>
-                        <Input
-                          type="text"
-                          placeholder={`Assignment ${index + 1}`}
-                          value={grade.name}
-                          onChange={(e) => updateGrade(grade.id, "name", e.target.value)}
-                          className="h-10 input-box rounded-lg text-sm"
-                        />
-                      </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {grades.map((grade, index) => (
+              <div key={grade.id} className="dc-row">
+                <div className="dc-row-grid" style={{ display: "grid", gridTemplateColumns: gridCols, gap: 10, alignItems: "center", ["--sm-cols" as string]: smCols }}>
+                  <input type="text" placeholder={`Assignment ${index + 1}`} value={grade.name} onChange={e => updateGrade(grade.id, "name", e.target.value)} className="dc-input dc-full" aria-label={`Assignment ${index + 1} name`} />
 
-                      {/* Grade Input */}
-                      {gradeType === "percentage" && (
-                        <div className="sm:col-span-3">
-                          <Label className="text-xs text-gray-600 mb-1.5 block">
-                            Grade (%)
-                          </Label>
-                          <Input
-                            type="number"
-                            min="0"
-                            max="150"
-                            step="0.1"
-                            value={grade.grade}
-                            onChange={(e) => updateGrade(grade.id, "grade", e.target.value)}
-                            className="h-10 input-box rounded-lg text-sm"
-                            placeholder="85"
-                          />
-                        </div>
-                      )}
-
-                      {gradeType === "letters" && (
-                        <div className="sm:col-span-3">
-                          <Label className="text-xs text-gray-600 mb-1.5 block">
-                            Letter
-                          </Label>
-                          <select
-                            value={grade.grade}
-                            onChange={(e) => updateGrade(grade.id, "grade", e.target.value)}
-                            className="h-10 w-full select-box rounded-lg text-sm px-3"
-                          >
-                            <option value="">Pick</option>
-                            {letterGradeOptions.map(letter => (
-                              <option key={letter} value={letter}>{letter}</option>
-                            ))}
-                          </select>
-                        </div>
-                      )}
-
-                      {gradeType === "points" && (
-                        <>
-                          <div className="sm:col-span-2">
-                            <Label className="text-xs text-gray-600 mb-1.5 block">
-                              Earned
-                            </Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.1"
-                              value={grade.points || ""}
-                              onChange={(e) => updateGrade(grade.id, "points", parseFloat(e.target.value) || 0)}
-                              className="h-10 input-box rounded-lg text-sm"
-                              placeholder="45"
-                            />
-                          </div>
-                          <div className="sm:col-span-2">
-                            <Label className="text-xs text-gray-600 mb-1.5 block">
-                              Out of
-                            </Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.1"
-                              value={grade.maxPoints || ""}
-                              onChange={(e) => updateGrade(grade.id, "maxPoints", parseFloat(e.target.value) || 0)}
-                              className="h-10 input-box rounded-lg text-sm"
-                              placeholder="50"
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      {/* Weight */}
-                      <div className={gradeType === "points" ? "sm:col-span-3" : "sm:col-span-3"}>
-                        <Label className="text-xs text-gray-600 mb-1.5 block">
-                          Weight (%)
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            type="number"
-                            min="0"
-                            max="100"
-                            step="1"
-                            value={grade.weight || ""}
-                            onChange={(e) => updateGrade(grade.id, "weight", parseFloat(e.target.value) || 0)}
-                            className="h-10 input-box rounded-lg text-sm pr-8"
-                            placeholder="20"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
-                        </div>
-                      </div>
-
-                      {/* Delete */}
-                      <div className="sm:col-span-1 flex items-end justify-end">
-                        <button
-                          onClick={() => removeGrade(grade.id)}
-                          disabled={grades.length === 1}
-                          className="delete-btn h-10 w-10 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
+                  {gradeType === "percentage" && (
+                    <div style={{ position: "relative" }}>
+                      <input type="number" inputMode="decimal" min="0" max="150" step="0.1" placeholder="85" value={grade.grade} onChange={e => updateGrade(grade.id, "grade", e.target.value)} className="dc-input" style={{ paddingRight: 30 }} aria-label={`Assignment ${index + 1} grade percent`} />
+                      <span className="dc-suffix">%</span>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  )}
 
-              {/* Add & Reset */}
-              <div className="flex gap-3 mb-6">
-                <button
-                  onClick={addGrade}
-                  className="add-btn flex-1 py-3 rounded-lg flex items-center justify-center gap-2 text-sm font-medium text-gray-600"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add row
-                </button>
-                <button
-                  onClick={handleReset}
-                  className="py-3 px-6 rounded-lg text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50"
-                >
-                  Clear
-                </button>
-              </div>
+                  {gradeType === "letters" && (
+                    <select value={grade.grade} onChange={e => updateGrade(grade.id, "grade", e.target.value)} className="dc-select" aria-label={`Assignment ${index + 1} letter grade`}>
+                      <option value="">Grade</option>
+                      {letterGradeOptions.map(l => <option key={l} value={l}>{l}</option>)}
+                    </select>
+                  )}
 
-              {/* Weight Warning */}
-              {totalWeight > 0 && totalWeight !== 100 && (
-                <div className={`flex items-start gap-2 p-3 rounded-lg text-sm mb-6 ${
-                  totalWeight > 100 
-                    ? 'bg-red-50 text-red-800 border border-red-200' 
-                    : 'bg-amber-50 text-amber-800 border border-amber-200'
-                }`}>
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-medium">Total: {totalWeight}%</span>
-                    {totalWeight < 100 && <span className="block mt-0.5 text-xs">That's okay if you're still waiting on grades</span>}
-                    {totalWeight > 100 && <span className="block mt-0.5 text-xs">Should be 100% or under</span>}
+                  {gradeType === "points" && (
+                    <>
+                      <input type="number" inputMode="decimal" min="0" step="0.1" placeholder="45" value={grade.points} onChange={e => updateGrade(grade.id, "points", e.target.value)} className="dc-input" aria-label={`Assignment ${index + 1} points earned`} />
+                      <input type="number" inputMode="decimal" min="0" step="0.1" placeholder="50" value={grade.maxPoints} onChange={e => updateGrade(grade.id, "maxPoints", e.target.value)} className="dc-input" aria-label={`Assignment ${index + 1} points possible`} />
+                    </>
+                  )}
+
+                  <div style={{ position: "relative" }}>
+                    <input type="number" inputMode="decimal" min="0" max="100" step="1" placeholder="20" value={grade.weight} onChange={e => updateGrade(grade.id, "weight", e.target.value)} className="dc-input" style={{ paddingRight: 30 }} aria-label={`Assignment ${index + 1} weight percent`} />
+                    <span className="dc-suffix">%</span>
                   </div>
+
+                  <button onClick={() => removeGrade(grade.id)} disabled={grades.length === 1} className="dc-del" aria-label={`Remove assignment ${index + 1}`}>
+                    <X style={{ width: 15, height: 15 }} />
+                  </button>
                 </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="dc-actions">
+            <button onClick={addGrade} className="dc-add"><Plus style={{ width: 15, height: 15 }} />Add assignment</button>
+            <button onClick={handleReset} className="dc-clear">Clear all</button>
+          </div>
+
+          {totalWeight > 100 && (
+            <div className="dc-note bad">
+              <AlertTriangle style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2, color: "#ef4444" }} />
+              <span><b>Weights add up to {totalWeight}%.</b> They should total 100% or less — double-check your syllabus.</span>
+            </div>
+          )}
+          {totalWeight > 0 && totalWeight < 100 && (
+            <div className="dc-note warn">
+              <AlertTriangle style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2, color: "#f59e0b" }} />
+              <span><b>Weights so far: {totalWeight}%.</b> That's fine mid-semester — the result is your average on what's been graded.</span>
+            </div>
+          )}
+          {noInput && (
+            <div className="dc-note warn">
+              <AlertTriangle style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2, color: "#f59e0b" }} />
+              <span>Enter a grade for at least one assignment first.</span>
+            </div>
+          )}
+
+          <button className="dc-btn" onClick={handleCalculate} disabled={isCalculating}>
+            {isCalculating
+              ? <><span className="dc-spin"><Loader2 style={{ width: 18, height: 18 }} /></span>Calculating…</>
+              : <><Calculator style={{ width: 18, height: 18 }} />Calculate My Grade</>}
+          </button>
+
+          {result && (
+            <div ref={resultRef} className={`dc-result ${flash}`} aria-live="polite">
+              <div className="dc-res-top">
+                <div>
+                  <p className="dc-res-label">Your overall grade</p>
+                  <p className="dc-res-big">{animatedOverall.toFixed(animatedOverall % 1 === 0 ? 0 : 2)}<small>%</small></p>
+                </div>
+                <div className="dc-letter"><b>{result.letter}</b><span>letter grade</span></div>
+              </div>
+              <div className="dc-track"><div className="dc-fill" style={{ width: `${barWidth}%` }} /></div>
+              <div className="dc-chips">
+                <div className="dc-chip"><b>{result.counted}</b><span>Items counted</span></div>
+                <div className="dc-chip"><b>{result.equalWeights ? "Equal" : `${result.weightUsed}%`}</b><span>Weight used</span></div>
+                <div className="dc-chip"><b>{nextLetter ? `${nextLetter[1]} at ${nextLetter[0]}%` : "Top grade"}</b><span>Next letter</span></div>
+              </div>
+              {result.equalWeights && result.counted > 1 && (
+                <p className="dc-res-note">No weights entered, so every assignment counts the same.</p>
               )}
-
-              {/* Calculate Button */}
-              <Button
-                onClick={handleCalculate}
-                disabled={isCalculating}
-                className="w-full h-12 btn-primary text-white font-semibold rounded-lg"
-              >
-                {isCalculating ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Calculating...
-                  </>
-                ) : (
-                  <>
-                    <Calculator className="mr-2 h-5 w-5" />
-                    Calculate
-                  </>
-                )}
-              </Button>
-
-              {/* Result */}
-              {showResult && calculatedResult && (
-                <div ref={resultRef} className="mt-8 result-appear">
-                  <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-8 text-center mb-4">
-                    <p className="text-sm text-blue-100 mb-2">Your grade</p>
-                    <p className="text-6xl font-bold text-white mb-3">
-                      {calculatedResult.overallGrade}%
-                    </p>
-                    {gradeInfo && (
-                      <div className="flex items-center justify-center gap-2">
-                        <span className={`text-4xl font-bold ${
-                          gradeInfo.color === 'green' ? 'text-green-300' :
-                          gradeInfo.color === 'blue' ? 'text-blue-300' :
-                          gradeInfo.color === 'yellow' ? 'text-yellow-300' :
-                          gradeInfo.color === 'orange' ? 'text-orange-300' :
-                          'text-red-300'
-                        }`}>
-                          {calculatedResult.letterGrade}
-                        </span>
-                        <span className="text-sm text-blue-100">({gradeInfo.label})</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-                      <p className="text-2xl font-bold text-gray-900">
-                        {grades.filter(g => gradeType === "points" ? (g.points || 0) > 0 : g.grade !== "").length}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">Items</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-                      <p className={`text-2xl font-bold ${totalWeight === 100 ? 'text-green-600' : 'text-amber-600'}`}>
-                        {totalWeight}%
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">Weight</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-                      <p className="text-2xl font-bold text-gray-900">
-                        {calculatedResult.weightedSum.toFixed(1)}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">Sum</p>
-                    </div>
-                  </div>
-                </div>
+              {result.skipped > 0 && (
+                <p className="dc-res-note">{result.skipped} {result.skipped === 1 ? "row has" : "rows have"} a grade but no weight, so {result.skipped === 1 ? "it was" : "they were"} left out.</p>
               )}
             </div>
+          )}
+        </div>
+
+        <p className="dc-micro">🔒 Nothing stored · All calculations happen in your browser</p>
+      </section>
+
+      {/* ═════════════ FEATURES ═════════════ */}
+      <section className="dc-sec white">
+        <div style={{ maxWidth: 1060, margin: "0 auto" }}>
+          <div className="dc-sec-head">
+            <span className="dc-tag">Why it helps</span>
+            <h2 className="dc-h2">Built for how classes <u>really</u> grade</h2>
+            <p className="dc-lead">Simple tools that actually work when you need them.</p>
+          </div>
+          <div className="dc-grid3">
+            {[
+              { icon: <Layers style={{ width: 22, height: 22 }} />, title: "Works with any format", desc: "Percentages, letter grades, raw points — switch between formats any time. The conversions are handled for you." },
+              { icon: <RefreshCw style={{ width: 22, height: 22 }} />, title: "Test what-ifs fast", desc: "Want to see what happens if you bomb the next quiz? Change one number and hit calculate again." },
+              { icon: <TrendingUp style={{ width: 22, height: 22 }} />, title: "Handles edge cases", desc: "Weights don't add to 100 yet? Fine. Extra credit above 100%? Enter it. No weights at all? You get a plain average." },
+            ].map((f, i) => (
+              <div key={i} className="dc-card">
+                <div className="dc-card-ico">{f.icon}</div>
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Why students keep coming back
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Simple tools that actually work when you need them
+      {/* ═════════════ FORMULA ═════════════ */}
+      <section className="dc-sec cream">
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <div className="dc-sec-head">
+            <span className="dc-tag">The math</span>
+            <h2 className="dc-h2">How weighted grades <u>work</u></h2>
+            <p className="dc-lead">Here's how your prof actually calculates your grade.</p>
+          </div>
+          <div className="dc-card" style={{ padding: 32 }}>
+            <p style={{ marginBottom: 20 }}>
+              Not everything counts the same. A final worth 30% matters way more than homework worth 5%. Each grade is multiplied by its weight, everything is added up, then divided by the total weight.
+            </p>
+            <div className="dc-formula" style={{ marginBottom: 22 }}>Grade = Σ(score × weight) ÷ Σ(weight)</div>
+            <p className="dc-kicker">Quick example</p>
+            <p style={{ marginBottom: 14 }}>
+              You have 88% on homework (20%), 75% on your midterm (30%), and 92% on quizzes (15%):
+            </p>
+            <div className="dc-code">
+              <div>(88 × 0.20) + (75 × 0.30) + (92 × 0.15)</div>
+              <div>= 17.6 + 22.5 + 13.8 = 53.9</div>
+              <div><span className="hl">53.9 ÷ 0.65 = 82.9%</span> ← your grade</div>
+            </div>
+            <p style={{ marginTop: 18 }}>
+              That 75% midterm pulls you down more than the 92% quizzes help because the midterm's worth more. Once you get how weighting works, you know where to focus your effort.
             </p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="feature-card bg-white rounded-xl p-8">
-              <div className="feature-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6">
-                <Zap className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Works with any format</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Percentages, letter grades, raw points—doesn't matter how your prof reports stuff. Switch between formats whenever. The calculator figures out the conversion so you don't have to pull out a spreadsheet.
-              </p>
-            </div>
-
-            <div className="feature-card bg-white rounded-xl p-8">
-              <div className="feature-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mb-6">
-                <RefreshCw className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">See results right away</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Type in a number, your grade updates instantly. No refresh button, no loading screens. Want to see what happens if you bomb the next test? Change the number and find out immediately what it does to your overall grade.
-              </p>
-            </div>
-
-            <div className="feature-card bg-white rounded-xl p-8">
-              <div className="feature-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-6">
-                <TrendingUp className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Handles weird situations</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Weights don't add to 100 yet? No problem. Got extra credit above 100%? Throw it in. Only halfway through the semester? Still works. The math adjusts automatically no matter what stage you're at in the course.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              The math behind weighted grades
-            </h2>
-            <p className="text-lg text-gray-600">
-              Here's how your prof actually calculates your grade
-            </p>
+      {/* ═════════════ FAQ ═════════════ */}
+      <section className="dc-sec white">
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <div className="dc-sec-head">
+            <span className="dc-tag">FAQ</span>
+            <h2 className="dc-h2">Common questions</h2>
           </div>
-
-          <div className="bg-gray-50 rounded-xl p-8 sm:p-10 border border-gray-200">
-            <div className="space-y-6 text-gray-700 leading-relaxed">
-              <p className="text-lg">
-                Not everything counts the same. A final worth 30% matters way more than homework worth 5%. Your prof multiplies each grade by its weight, adds everything up, then divides by the total weight. That's your course grade.
-              </p>
-              
-              <div className="bg-white rounded-lg p-6 border border-gray-200">
-                <p className="text-sm font-semibold text-gray-900 mb-3">Quick example</p>
-                <p className="mb-3">
-                  Say you've got 88% on homework (20% of grade), 75% on your midterm (30% of grade), and 92% on quizzes (15% of grade).
-                </p>
-                <div className="bg-gray-50 rounded p-4 font-mono text-sm space-y-1.5">
-                  <p>(88 × 0.20) + (75 × 0.30) + (92 × 0.15)</p>
-                  <p>= 17.6 + 22.5 + 13.8</p>
-                  <p>= 53.9 ÷ 0.65 = 82.9%</p>
-                </div>
-              </div>
-
-              <p>
-                That 75% midterm pulls you down more than the 92% quizzes help because the midterm's worth more. Once you get how weighting works, you know where to focus your effort. No point stressing over a 5% assignment when you've got a 30% exam coming up.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="space-y-3">
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {faqData.map((faq, idx) => (
-              <div key={idx} className="faq-box bg-white rounded-xl overflow-hidden">
-                <button
-                  onClick={() => toggleFaq(idx)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
-                >
-                  <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
-                  <ChevronDown className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${openFaq === idx ? 'rotate-180' : ''}`} />
+              <div key={idx} className={`dc-faq ${openFaq === idx ? "open" : ""}`}>
+                <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)} aria-expanded={openFaq === idx}>
+                  <span>{faq.question}</span>
+                  <ChevronDown style={{ width: 18, height: 18, flexShrink: 0, transition: "transform 0.25s", transform: openFaq === idx ? "rotate(180deg)" : "none" }} />
                 </button>
-                <div className={`faq-content ${openFaq === idx ? 'open' : ''}`}>
-                  <div className="px-6 pb-5">
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                  </div>
+                <div className="dc-faq-body" style={{ maxHeight: openFaq === idx ? 400 : 0 }}>
+                  <p>{faq.answer}</p>
                 </div>
               </div>
             ))}
@@ -777,26 +319,20 @@ export default function GradeCalculator() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-10 sm:p-12 text-center">
-            <Target className="w-14 h-14 text-blue-100 mx-auto mb-5" />
-            <h3 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Got a final exam coming up?
-            </h3>
-            <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
-              Use our other calculator to figure out exactly what score you need on your final to hit whatever grade you're shooting for.
-            </p>
-            <Button
-              onClick={handleNavigateHome}
-              className="bg-white hover:bg-gray-50 text-blue-700 font-semibold px-8 py-4 rounded-xl h-auto text-base"
-            >
-              <Home className="mr-2 w-5 h-5" />
-              Final grade calculator
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
+      <CalculatorLinks current="/grade-calculator" />
+
+      {/* ═════════════ CTA ═════════════ */}
+      <section className="dc-sec ink">
+        <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center" }}>
+          <span className="dc-tag">Finals week?</span>
+          <h2 className="dc-h2">Got a final exam <u>coming up</u>?</h2>
+          <p className="dc-lead" style={{ marginBottom: 34 }}>
+            The Final Grade Calculator tells you exactly what score you need on your final to hit your target grade.
+          </p>
+          <Link href="/" className="dc-cta-btn">
+            Final Grade Calculator
+            <ArrowRight style={{ width: 18, height: 18 }} />
+          </Link>
         </div>
       </section>
 
